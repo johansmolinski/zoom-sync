@@ -8,7 +8,7 @@ void setup() {
   PORTD &= ~(0b1100);
   DDRB |= 1 << 5; // PB5 output
   
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 
