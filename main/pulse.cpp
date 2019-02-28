@@ -28,7 +28,12 @@ void flankResetOnPulseLow(state_t *state, uint8_t *bit_in, uint8_t *flank_read) 
 }
 
 void startHostBeat(state_t *state) {
+  if (state->trig_since_gate) {
     state->tempo = state->measure_counter / state->multiplier;
+  }
+  else {
+    state->trig_since_gate = true;
+  }
     makePulse(state);
     state->measure_counter = 0;
     state->pulse_counter = state->multiplier - 1;
@@ -54,19 +59,26 @@ void beatDividerTrig(state_t *state) {
 
 void pulse(state_t *state) {
   // Flank reset
+  flankResetOnPulseLow(state, &state->gate_in, &state->flank_gate_read);
   flankResetOnPulseLow(state, &state->trig_in, &state->flank_trig_read);
 
-  // Flank trigger check
-  if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
-    // Triggered!
-    startHostBeat(state);
+  if (flankTriggerOnPulseHigh(state, &state->gate_in, &state->flank_gate_read)) {
+    state->trig_since_gate = false;
   }
 
-  // Counter reaching divided Tempo length, trig Pulse
-  beatDividerTrig(state);
+  if (state->flank_gate_read) {
+    // Flank trigger check
+    if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
+      // Triggered!
+      startHostBeat(state);
+    }
 
-  // Pulse is triggered, emit led
-  syncManager(state);
+    // Counter reaching divided Tempo length, trig Pulse
+    beatDividerTrig(state);
+
+    // Pulse is triggered, emit led
+    syncManager(state);
+  }
 
   state->measure_counter++;
 }

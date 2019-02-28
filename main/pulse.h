@@ -11,6 +11,7 @@ typedef struct _state {
   uint8_t sync_on = 0;
   uint8_t flank_trig_read = 0;
   uint8_t flank_gate_read = 0;
+  bool trig_since_gate;
   uint16_t tempo = 0;
 
   // Configuration

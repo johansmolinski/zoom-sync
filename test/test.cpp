@@ -80,6 +80,7 @@ TEST(Pulse, Pulse) {
 
   int loops = 10;
 
+  flank_gate_high();
   flank_trig_high();
   run(pulse, loops);
   flank_trig_low();
@@ -91,6 +92,39 @@ TEST(Pulse, Pulse) {
   ASSERT_EQ(2 * loops / state.multiplier, state.tempo);
   //ASSERT_EQ(5, state.beat_counter);
   ASSERT_EQ(5, state.pulse_counter);
+}
+
+TEST(Pulse, Gate) {
+  setup();
+
+  state.multiplier = 4;
+
+  flank_gate_high();
+  run(pulse, 78);
+  flank_trig_high();
+  run(pulse, 10);
+  flank_trig_low();
+  run(pulse, 10);
+  flank_trig_high();
+  run(pulse, 10);
+  ASSERT_EQ(5, state.tempo);
+  flank_trig_low();
+  flank_gate_low();
+  run(pulse, 50);
+  flank_gate_high();
+  flank_trig_high();
+  run(pulse, 10);
+  // If gate support is incorrect, the tempo will be off. When gate runs low,
+  // any ongoing tempo measurement should be discarded and the last known tempo
+  // should be saved.
+  ASSERT_EQ(5, state.tempo);
+  run(pulse, 10);
+
+  //flank_trig_high();
+  //run(pulse, 10);
+  //flank_trig_low();
+  //run(pulse, 10);
+  //ASSERT_EQ(20, state.measure_counter);
 }
 
 int main(int argc, char **argv) {
