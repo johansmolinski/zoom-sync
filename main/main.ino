@@ -3,10 +3,10 @@
 state_t state;
 
 void setup() {
-  state.register_in = &PIND;
-  state.register_out = &PORTB;
-  state.bit_in = 2;
-  state.bit_out = 5;
+  state.register_in = &PIND;     // Input register
+  state.bit_in = 2;              // Input bit
+  state.register_out = &PORTB;   // Output register
+  state.bit_out = 5;             // Output bit
 
   DDRD &= ~(1 << state.bit_in);  // Set bit_in as input
   PORTD &= ~(1 << state.bit_in); // Disable pullup
