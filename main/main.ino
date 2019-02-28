@@ -7,13 +7,15 @@ void setup() {
   state.multiplier = 16;         // Number of generated pulses per given pulse
 
   state.register_in = &PIND;     // Input register
-  state.bit_in = 2;              // Input bit
+  state.trig_in = 2;             // Trig input bit
+  state.gate_in = 3;             // Gate input bit
   state.register_out = &PORTB;   // Output register
-  state.bit_out = 5;             // Output bit
+  state.pulse_out = 5;           // Pulse output bit
+  state.start_out = 6;           // Start output bit
 
-  DDRD &= ~(1 << state.bit_in);  // Set bit_in as input
-  PORTD &= ~(1 << state.bit_in); // Disable pullup
-  DDRB |= 1 << state.bit_out;    // Set bit_out as output
+  DDRD = 0x00;                   // PD all input
+  PORTD = 0x00;                  // No pullups
+  DDRB = 0xff;                   // PB all output
   
   //Serial.begin(9600);
 }

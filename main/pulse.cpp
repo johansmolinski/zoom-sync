@@ -11,19 +11,19 @@ void makePulse(state_t *state) {
 
 void syncManager(state_t *state) {
   if (state->sync_on) {
-    set_high(state->register_out, state->bit_out);
+    set_high(state->register_out, state->pulse_out);
     state->sync_on--;
     //Serial.println("On");
   }
   else {
-    set_low(state->register_out, state->bit_out);
+    set_low(state->register_out, state->pulse_out);
     //Serial.println("Off");
   }
 }
 
-void flankResetOnPulseLow(state_t *state) {
-  if (read_in(state->register_in, state->bit_in) == 0) {
-    state->flank_read = 0;
+void flankResetOnPulseLow(state_t *state, uint8_t *bit_in, uint8_t *flank_read) {
+  if (read_in(state->register_in, *bit_in) == 0) {
+    *flank_read = 0;
   }
 }
 
@@ -35,9 +35,9 @@ void startHostBeat(state_t *state) {
     state->beat_counter = 0;
 }
 
-bool flankTriggerOnPulseHigh(state_t *state) {
-  if (read_in(state->register_in, state->bit_in) && state->flank_read == 0) {
-    state->flank_read = 1;
+bool flankTriggerOnPulseHigh(state_t *state, uint8_t *bit_in, uint8_t *flank_read) {
+  if (read_in(state->register_in, *bit_in) && *flank_read == 0) {
+    *flank_read = 1;
     return true;
   }
   return false;
@@ -54,10 +54,10 @@ void beatDividerTrig(state_t *state) {
 
 void pulse(state_t *state) {
   // Flank reset
-  flankResetOnPulseLow(state);
+  flankResetOnPulseLow(state, &state->trig_in, &state->flank_trig_read);
 
   // Flank trigger check
-  if (flankTriggerOnPulseHigh(state)) {
+  if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
     // Triggered!
     startHostBeat(state);
   }

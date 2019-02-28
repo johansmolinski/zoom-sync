@@ -9,14 +9,16 @@ typedef struct _state {
   uint16_t beat_counter = 0;
   uint8_t pulse_counter = 0;
   uint8_t sync_on = 0;
-  uint8_t flank_read = 0;
+  uint8_t flank_trig_read = 0;
+  uint8_t flank_gate_read = 0;
   uint16_t tempo = 0;
 
   // Configuration
   uint16_t pulse_time;
   uint8_t multiplier;
   unsigned char *register_in, *register_out;
-  uint8_t bit_in, bit_out;
+  uint8_t trig_in, gate_in;
+  uint8_t pulse_out, start_out;
 } state_t;
 
 void pulse(state_t *state);
