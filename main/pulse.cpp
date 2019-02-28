@@ -1,13 +1,17 @@
 #include "pulse.h"
 
-void pulse(state_t *state, unsigned char *reg_in, unsigned char *reg_out, uint8_t bit_in, uint8_t bit_out) {
+#define read_in(register_in, bit_in) (*register_in & 1 << bit_in)
+#define set_high(register_out, bit_out) (*register_out |= 1 << bit_out)
+#define set_low(register_out, bit_out) (*register_out &= ~(1 << bit_out))
+
+void pulse(state_t *state) {
   // Flank reset
-  if ((*reg_in & 1 << bit_in) == 0) {
+  if (read_in(state->register_in, state->bit_in) == 0) {
     state->flank_read = 0;
   }
 
   // Flank triggered, restart Tempo counting
-  if ((*reg_in & 1 << bit_in) && state->flank_read == 0) {
+  if (read_in(state->register_in, state->bit_in) && state->flank_read == 0) {
     state->flank_read = 1;
     state->tempo = state->measure_counter / MULTIPLYER;
     state->sync_on = PULSE_TIME;
@@ -24,12 +28,12 @@ void pulse(state_t *state, unsigned char *reg_in, unsigned char *reg_out, uint8_
 
   // Pulse is triggered, emit led
   if (state->sync_on) {
-    *reg_out |= 1 << bit_out;
+    set_high(state->register_out, state->bit_out);
     state->sync_on--;
     //Serial.println("On");
   }
   else {
-    *reg_out &= ~(1 << bit_out);
+    set_low(state->register_out, state->bit_out);
     //Serial.println("Off");
   }  
 
