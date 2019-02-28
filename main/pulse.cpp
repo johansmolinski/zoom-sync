@@ -6,14 +6,14 @@
 #define set_low(register_out, bit_out) (*register_out &= ~(1 << bit_out))
 
 void makePulse(state_t *state) {
-  state->sync_on = state->pulse_time;
+  state->sync_pulse_on = state->pulse_time;
 }
 
 void syncManager(state_t *state) {
-  if (state->sync_on) {
+  if (state->sync_pulse_on) {
     set_high(state->register_out, state->pulse_out);
     set_high(state->register_debug, 5); //debug
-    state->sync_on--;
+    state->sync_pulse_on--;
     //Serial.println("On");
   }
   else {

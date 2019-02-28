@@ -42,11 +42,11 @@ TEST(Pulse, FlankReset) {
 TEST(Pulse, SyncOnAndOff) {
   setup();
 
-  ASSERT_EQ(0, state.sync_on); // No pulse counter
+  ASSERT_EQ(0, state.sync_pulse_on); // No pulse counter
   ASSERT_EQ(0, read_sync()); // Sync is off
   makePulse(&state);
   syncManager(&state);
-  ASSERT_NE(0, state.sync_on); // Pulse is on
+  ASSERT_NE(0, state.sync_pulse_on); // Pulse is on
   ASSERT_NE(0, read_sync()); // Sync is on
 
   for (int i = 0; i < state.pulse_time; i++) {
@@ -62,7 +62,7 @@ TEST(Pulse, StartHostBeat) {
   int tempo = state.measure_counter / state.multiplier;
 
   startHostBeat(&state);
-  ASSERT_NE(0, state.sync_on); // Pulse is on
+  ASSERT_NE(0, state.sync_pulse_on); // Pulse is on
   ASSERT_EQ(tempo, state.tempo); // Tempo is Measure Counter divided by MULTIPLYER
 }
 

@@ -8,7 +8,8 @@ typedef struct _state {
   uint16_t measure_counter = 0;
   uint16_t beat_counter = 0;
   uint8_t pulse_counter = 0;
-  uint8_t sync_on = 0;
+  uint8_t sync_pulse_on = 0;
+  uint8_t sync_start_on = 0;
   uint8_t flank_trig_read = 0;
   uint8_t flank_gate_read = 0;
   bool trig_since_gate;
