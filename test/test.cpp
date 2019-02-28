@@ -50,10 +50,11 @@ TEST(Pulse, SyncOnAndOff) {
 TEST(Pulse, StartHostBeat) {
   setup();
   state.measure_counter = 200;
+  int tempo = state.measure_counter / MULTIPLYER;
 
   startHostBeat(&state);
   ASSERT_NE(0, state.sync_on); // Pulse is on
-  ASSERT_EQ(50, state.tempo); // Tempo is Measure Counter divided by MULTIPLYER
+  ASSERT_EQ(tempo, state.tempo); // Tempo is Measure Counter divided by MULTIPLYER
 }
 
 TEST(Pulse, BeatDivider) {
@@ -79,9 +80,9 @@ TEST(Pulse, Pulse) {
 
   flank_high();
   run(pulse, loops);
-  ASSERT_EQ(5, state.tempo);
+  ASSERT_EQ(2 * loops / MULTIPLYER, state.tempo);
   //ASSERT_EQ(5, state.beat_counter);
-  ASSERT_EQ(1, state.pulse_counter);
+  ASSERT_EQ(5, state.pulse_counter);
 }
 
 int main(int argc, char **argv) {

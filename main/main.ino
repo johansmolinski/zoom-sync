@@ -21,5 +21,5 @@ void loop() {
 
   pulse(&state);
 
-  delay(1);
+  delayMicroseconds(100);
 }

@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-const int PULSE_TIME = 20;
-const int MULTIPLYER = 4;
+const unsigned int PULSE_TIME = 200;
+const unsigned int MULTIPLYER = 16;
 
 typedef struct _state {
   // State variables
