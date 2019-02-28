@@ -67,19 +67,17 @@ void pulse(state_t *state) {
     state->trig_since_gate = false;
   }
 
-  if (state->flank_gate_read) {
-    // Flank trigger check
-    if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
-      // Triggered!
-      startHostBeat(state);
-    }
-
-    // Counter reaching divided Tempo length, trig Pulse
-    beatDividerTrig(state);
-
-    // Pulse is triggered, emit led
-    syncManager(state);
+  // Flank trigger check
+  if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
+    // Triggered!
+    startHostBeat(state);
   }
+
+  // Counter reaching divided Tempo length, trig Pulse
+  beatDividerTrig(state);
+
+  // Pulse is triggered, emit led
+  syncManager(state);
 
   state->measure_counter++;
 }
