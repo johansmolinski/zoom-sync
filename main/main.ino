@@ -3,8 +3,8 @@
 void setup() {
   // put your setup code here, to run once:
 
-  DDRD &= ~(0x03); // PD2 and PD3 inputs
-  PORTD &= ~(0x03);
+  DDRD &= ~(0b1100); // PD2 and PD3 inputs
+  PORTD &= ~(0b1100);
   DDRB |= 1 << 5; // PB5 output
   
   Serial.begin(9600);
