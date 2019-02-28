@@ -7,7 +7,9 @@
   state.register_in = &REG_IN;\
   state.bit_in = 2;\
   state.register_out = &REG_OUT;\
-  state.bit_out = 5
+  state.bit_out = 5;\
+  state.multiplier = 16;\
+  state.pulse_time = 200
 
 #define run(f, n) for(int i=0; i<n; i++) f(&state)
 #define flank_high() REG_IN = 0xff
@@ -40,7 +42,7 @@ TEST(Pulse, SyncOnAndOff) {
   ASSERT_NE(0, state.sync_on); // Pulse is on
   ASSERT_NE(0, REG_OUT); // Sync is on
 
-  for (int i = 0; i < PULSE_TIME; i++) {
+  for (int i = 0; i < state.pulse_time; i++) {
     ASSERT_NE(0, REG_OUT); // Sync is on
     syncManager(&state);
   }
@@ -50,7 +52,7 @@ TEST(Pulse, SyncOnAndOff) {
 TEST(Pulse, StartHostBeat) {
   setup();
   state.measure_counter = 200;
-  int tempo = state.measure_counter / MULTIPLYER;
+  int tempo = state.measure_counter / state.multiplier;
 
   startHostBeat(&state);
   ASSERT_NE(0, state.sync_on); // Pulse is on
@@ -80,7 +82,7 @@ TEST(Pulse, Pulse) {
 
   flank_high();
   run(pulse, loops);
-  ASSERT_EQ(2 * loops / MULTIPLYER, state.tempo);
+  ASSERT_EQ(2 * loops / state.multiplier, state.tempo);
   //ASSERT_EQ(5, state.beat_counter);
   ASSERT_EQ(5, state.pulse_counter);
 }

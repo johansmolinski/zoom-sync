@@ -3,6 +3,9 @@
 state_t state;
 
 void setup() {
+  state.pulse_time = 200;        // Number of ticks for pulse to be active
+  state.multiplier = 16;         // Number of generated pulses per given pulse
+
   state.register_in = &PIND;     // Input register
   state.bit_in = 2;              // Input bit
   state.register_out = &PORTB;   // Output register

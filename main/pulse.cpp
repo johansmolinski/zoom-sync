@@ -6,7 +6,7 @@
 #define set_low(register_out, bit_out) (*register_out &= ~(1 << bit_out))
 
 void makePulse(state_t *state) {
-  state->sync_on = PULSE_TIME;
+  state->sync_on = state->pulse_time;
 }
 
 void syncManager(state_t *state) {
@@ -28,10 +28,10 @@ void flankResetOnPulseLow(state_t *state) {
 }
 
 void startHostBeat(state_t *state) {
-    state->tempo = state->measure_counter / MULTIPLYER;
+    state->tempo = state->measure_counter / state->multiplier;
     makePulse(state);
     state->measure_counter = 0;
-    state->pulse_counter = MULTIPLYER - 1;
+    state->pulse_counter = state->multiplier - 1;
     state->beat_counter = 0;
 }
 

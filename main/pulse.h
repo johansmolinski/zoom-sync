@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-const unsigned int PULSE_TIME = 200;
-const unsigned int MULTIPLYER = 16;
-
 typedef struct _state {
   // State variables
   uint16_t measure_counter = 0;
@@ -16,6 +13,8 @@ typedef struct _state {
   uint16_t tempo = 0;
 
   // Configuration
+  uint16_t pulse_time;
+  uint8_t multiplier;
   unsigned char *register_in, *register_out;
   uint8_t bit_in, bit_out;
 } state_t;
