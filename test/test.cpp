@@ -2,12 +2,13 @@
 #include <gtest/gtest.h>
 
 #define setup() \
-  uint8_t REG_OUT = 0, REG_IN = 0;\
+  uint8_t REG_OUT = 0, REG_IN = 0, REG_DEBUG = 0;\
   state_t state;\
   state.register_in = &REG_IN;\
   state.trig_in = 2;\
   state.gate_in = 3;\
   state.register_out = &REG_OUT;\
+  state.register_debug = &REG_DEBUG;\
   state.pulse_out = 5;\
   state.start_out = 6;\
   state.multiplier = 16;\

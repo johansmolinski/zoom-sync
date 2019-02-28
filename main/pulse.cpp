@@ -12,11 +12,13 @@ void makePulse(state_t *state) {
 void syncManager(state_t *state) {
   if (state->sync_on) {
     set_high(state->register_out, state->pulse_out);
+    set_high(state->register_debug, 5); //debug
     state->sync_on--;
     //Serial.println("On");
   }
   else {
     set_low(state->register_out, state->pulse_out);
+    set_low(state->register_debug, 5); //debug
     //Serial.println("Off");
   }
 }
