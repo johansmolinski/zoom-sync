@@ -12,8 +12,10 @@
   state.pulse_time = 200
 
 #define run(f, n) for(int i=0; i<n; i++) f(&state)
-#define flank_high() REG_IN = 0xff
-#define flank_low() REG_IN = 0x00
+#define flank_high() REG_IN |= 1 << state.bit_in
+#define flank_low() REG_IN &= ~(1 << state.bit_in)
+
+#define read_sync() (REG_OUT & (1 << state.bit_out))
 
 TEST(Pulse, FlankReset) {
   setup();
@@ -36,17 +38,17 @@ TEST(Pulse, SyncOnAndOff) {
   setup();
 
   ASSERT_EQ(0, state.sync_on); // No pulse counter
-  ASSERT_EQ(0, REG_OUT); // Sync is off
+  ASSERT_EQ(0, read_sync()); // Sync is off
   makePulse(&state);
   syncManager(&state);
   ASSERT_NE(0, state.sync_on); // Pulse is on
-  ASSERT_NE(0, REG_OUT); // Sync is on
+  ASSERT_NE(0, read_sync()); // Sync is on
 
   for (int i = 0; i < state.pulse_time; i++) {
-    ASSERT_NE(0, REG_OUT); // Sync is on
+    ASSERT_NE(0, read_sync()); // Sync is on
     syncManager(&state);
   }
-  ASSERT_EQ(0, REG_OUT); // Sync is off
+  ASSERT_EQ(0, read_sync()); // Sync is off
 }
 
 TEST(Pulse, StartHostBeat) {
