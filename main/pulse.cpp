@@ -34,10 +34,11 @@ void startHostBeat(state_t *state) {
   else {
     state->trig_since_gate = true;
   }
-    makePulse(state);
-    state->measure_counter = 0;
-    state->pulse_counter = state->multiplier - 1;
-    state->beat_counter = 0;
+
+  makePulse(state);
+  state->measure_counter = 0;
+  state->pulse_counter = state->multiplier - 1;
+  state->beat_counter = 0;
 }
 
 bool flankTriggerOnPulseHigh(state_t *state, uint8_t *bit_in, uint8_t *flank_read) {
