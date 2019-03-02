@@ -12,7 +12,7 @@ void makePulse(state_t *state) {
 }
 
 void buttonManager(state_t *state) {
-  if (read_in(state->register_in, state->gate_in) == 0) {
+  if (read_in(state->register_in, state->play_in) == 0) {
     state->gate_on = true;
   }
   if (read_in(state->register_in, state->stop_in) == 0) {
@@ -54,11 +54,11 @@ void startHostBeat(state_t *state) {
   state->measure_counter = 0;
   state->pulse_counter = state->multiplier - 1;
   state->beat_counter = 0;
-  set_high(state->register_out, state->start_out);
+  set_high(state->register_out, state->gate_out);
 }
 
 void stopHostBeat(state_t *state) {
-  set_low(state->register_out, state->start_out);
+  set_low(state->register_out, state->gate_out);
 }
 
 bool flankTriggerOnPulseHigh(state_t *state, uint8_t *bit_in, uint8_t *flank_read) {

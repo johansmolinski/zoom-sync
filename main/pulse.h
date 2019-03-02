@@ -19,8 +19,8 @@ typedef struct _state {
   uint16_t pulse_time;
   uint8_t multiplier;
   unsigned char *register_in, *register_out, *register_debug;
-  uint8_t trig_in, gate_in, stop_in;
-  uint8_t pulse_out, start_out;
+  uint8_t trig_in, play_in, stop_in;
+  uint8_t pulse_out, gate_out;
 } state_t;
 
 void pulse(state_t *state);

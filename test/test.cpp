@@ -6,13 +6,13 @@
   state_t state;\
   state.register_in = &REG_IN;\
   state.trig_in = 2;\
-  state.gate_in = 3;\
+  state.play_in = 3;\
   state.stop_in = 4;\
   state.gate_on = false;\
   state.register_out = &REG_OUT;\
   state.register_debug = &REG_DEBUG;\
   state.pulse_out = 2;\
-  state.start_out = 3;\
+  state.gate_out = 3;\
   state.multiplier = 16;\
   state.pulse_time = 200
 
@@ -21,15 +21,15 @@
 #define flank_trig_high() REG_IN |= 1 << state.trig_in
 #define flank_trig_low() REG_IN &= ~(1 << state.trig_in)
 
-#define press_start() REG_IN &= ~(1 << state.gate_in)
-#define release_start() REG_IN |= 1 << state.gate_in
+#define press_start() REG_IN &= ~(1 << state.play_in)
+#define release_start() REG_IN |= 1 << state.play_in
 #define press_stop() REG_IN &= ~(1 << state.stop_in)
 #define release_stop() REG_IN |= 1 << state.stop_in
 
 #define read_flank(bit_in) REG_IN & (1 << bit_in)
 
 #define read_sync_pulse() (REG_OUT & (1 << state.pulse_out))
-#define read_sync_start() (REG_OUT & (1 << state.start_out))
+#define read_sync_start() (REG_OUT & (1 << state.gate_out))
 
 TEST(Pulse, FlankReset) {
   setup();
@@ -80,11 +80,11 @@ TEST(Pulse, GateOnStartButton) {
   setup();
 
   release_start();
-  ASSERT_TRUE(read_in(state.register_in, state.gate_in));
+  ASSERT_TRUE(read_in(state.register_in, state.play_in));
   buttonManager(&state);
   ASSERT_FALSE(state.gate_on);
   press_start();
-  ASSERT_FALSE(read_in(state.register_in, state.gate_in));
+  ASSERT_FALSE(read_in(state.register_in, state.play_in));
   buttonManager(&state);
   ASSERT_TRUE(state.gate_on);
   release_start();
