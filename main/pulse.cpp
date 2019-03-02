@@ -9,15 +9,15 @@ void makePulse(state_t *state) {
   state->sync_pulse_on = state->pulse_time;
 }
 
-void syncManager(state_t *state) {
-  if (state->sync_pulse_on) {
-    set_high(state->register_out, state->pulse_out);
+void syncManager(state_t *state, uint8_t *sync, uint8_t out) {
+  if (*sync) {
+    set_high(state->register_out, out);
     set_high(state->register_debug, 5); //debug
-    state->sync_pulse_on--;
+    (*sync)--;
     //Serial.println("On");
   }
   else {
-    set_low(state->register_out, state->pulse_out);
+    set_low(state->register_out, out);
     set_low(state->register_debug, 5); //debug
     //Serial.println("Off");
   }
@@ -67,6 +67,7 @@ void pulse(state_t *state) {
 
   if (flankTriggerOnPulseHigh(state, &state->gate_in, &state->flank_gate_read)) {
     state->trig_since_gate = false;
+    state->sync_start_on = state->pulse_time;
   }
 
   // Flank trigger check
@@ -79,7 +80,8 @@ void pulse(state_t *state) {
   beatDividerTrig(state);
 
   // Pulse is triggered, emit led
-  syncManager(state);
+  syncManager(state, &(state->sync_pulse_on), state->pulse_out);
+  syncManager(state, &(state->sync_start_on), state->start_out);
 
   state->measure_counter++;
 }

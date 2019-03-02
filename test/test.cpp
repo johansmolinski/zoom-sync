@@ -9,8 +9,8 @@
   state.gate_in = 3;\
   state.register_out = &REG_OUT;\
   state.register_debug = &REG_DEBUG;\
-  state.pulse_out = 5;\
-  state.start_out = 6;\
+  state.pulse_out = 2;\
+  state.start_out = 3;\
   state.multiplier = 16;\
   state.pulse_time = 200
 
@@ -45,13 +45,13 @@ TEST(Pulse, SyncOnAndOff) {
   ASSERT_EQ(0, state.sync_pulse_on); // No pulse counter
   ASSERT_EQ(0, read_sync()); // Sync is off
   makePulse(&state);
-  syncManager(&state);
+  syncManager(&state, &state.sync_pulse_on, state.pulse_out);
   ASSERT_NE(0, state.sync_pulse_on); // Pulse is on
   ASSERT_NE(0, read_sync()); // Sync is on
 
   for (int i = 0; i < state.pulse_time; i++) {
     ASSERT_NE(0, read_sync()); // Sync is on
-    syncManager(&state);
+    syncManager(&state, &(state.sync_pulse_on), state.pulse_out);
   }
   ASSERT_EQ(0, read_sync()); // Sync is off
 }
