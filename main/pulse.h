@@ -11,7 +11,7 @@ typedef struct _state {
   uint8_t sync_pulse_on = 0;
   uint8_t sync_start_on = 0;
   uint8_t flank_trig_read = 0;
-  uint8_t flank_gate_read = 0;
+  bool gate_on;
   bool trig_since_gate;
   uint16_t tempo = 0;
 
@@ -19,7 +19,7 @@ typedef struct _state {
   uint16_t pulse_time;
   uint8_t multiplier;
   unsigned char *register_in, *register_out, *register_debug;
-  uint8_t trig_in, gate_in;
+  uint8_t trig_in, gate_in, stop_in;
   uint8_t pulse_out, start_out;
 } state_t;
 

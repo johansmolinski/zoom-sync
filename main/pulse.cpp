@@ -6,7 +6,19 @@
 #define set_low(register_out, bit_out) (*register_out &= ~(1 << bit_out))
 
 void makePulse(state_t *state) {
-  state->sync_pulse_on = state->pulse_time;
+  if (state->gate_on) {
+    state->sync_pulse_on = state->pulse_time;
+  }
+}
+
+void buttonManager(state_t *state) {
+  if (read_in(state->register_in, state->gate_in) == 0) {
+    state->gate_on = true;
+  }
+  if (read_in(state->register_in, state->stop_in) == 0) {
+    state->gate_on = false;
+    state->trig_since_gate = false;
+  }
 }
 
 void syncManager(state_t *state, uint8_t *sync, uint8_t out) {
@@ -37,10 +49,16 @@ void startHostBeat(state_t *state) {
     state->trig_since_gate = true;
   }
 
+  state->sync_start_on = state->pulse_time;
   makePulse(state);
   state->measure_counter = 0;
   state->pulse_counter = state->multiplier - 1;
   state->beat_counter = 0;
+  set_high(state->register_out, state->start_out);
+}
+
+void stopHostBeat(state_t *state) {
+  set_low(state->register_out, state->start_out);
 }
 
 bool flankTriggerOnPulseHigh(state_t *state, uint8_t *bit_in, uint8_t *flank_read) {
@@ -62,26 +80,25 @@ void beatDividerTrig(state_t *state) {
 
 void pulse(state_t *state) {
   // Flank reset
-  flankResetOnPulseLow(state, &state->gate_in, &state->flank_gate_read);
   flankResetOnPulseLow(state, &state->trig_in, &state->flank_trig_read);
 
-  if (flankTriggerOnPulseHigh(state, &state->gate_in, &state->flank_gate_read)) {
-    state->trig_since_gate = false;
-    state->sync_start_on = state->pulse_time;
+  buttonManager(state);
+
+  if (state->gate_on) {
+    // Flank trigger check
+    if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
+      // Triggered!
+      startHostBeat(state);
+    }
+
+    // Counter reaching divided Tempo length, trig Pulse
+    beatDividerTrig(state);
   }
-
-  // Flank trigger check
-  if (flankTriggerOnPulseHigh(state, &state->trig_in, &state->flank_trig_read)) {
-    // Triggered!
-    startHostBeat(state);
+  else {
+    stopHostBeat(state);
   }
-
-  // Counter reaching divided Tempo length, trig Pulse
-  beatDividerTrig(state);
-
   // Pulse is triggered, emit led
   syncManager(state, &(state->sync_pulse_on), state->pulse_out);
-  syncManager(state, &(state->sync_start_on), state->start_out);
 
   state->measure_counter++;
 }
