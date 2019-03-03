@@ -2,12 +2,16 @@
 #include <gtest/gtest.h>
 
 #define setup() \
-  uint8_t REG_OUT = 0, REG_IN = 0b00011000, REG_DEBUG = 0;\
+  uint8_t REG_OUT = 0, REG_IN = 0b00011010, REG_LINE_IN = 0x00, REG_DEBUG = 0;\
   state_t state;\
   state.register_in = &REG_IN;\
+  state.buttonline_in = &REG_LINE_IN;\
   state.trig_in = 2;\
   state.play_in = 3;\
   state.stop_in = 4;\
+  state.rewind_in = 1;\
+  state.line0_in = 0;\
+  state.line1_in = 1;\
   state.gate_on = false;\
   state.register_out = &REG_OUT;\
   state.register_debug = &REG_DEBUG;\
@@ -21,10 +25,12 @@
 #define flank_trig_high() REG_IN |= 1 << state.trig_in
 #define flank_trig_low() REG_IN &= ~(1 << state.trig_in)
 
-#define press_start() REG_IN &= ~(1 << state.play_in)
+#define press_start() { REG_IN &= ~(1 << state.play_in); REG_LINE_IN = 0x02; }
 #define release_start() REG_IN |= 1 << state.play_in
-#define press_stop() REG_IN &= ~(1 << state.stop_in)
+#define press_stop() { REG_IN &= ~(1 << state.stop_in); REG_LINE_IN = 0x02; }
 #define release_stop() REG_IN |= 1 << state.stop_in
+#define press_rewind() { REG_IN &= ~(1 << state.rewind_in); REG_LINE_IN = 0x01; }
+#define release_rewind() REG_IN |= 1 << state.rewind_in
 
 #define read_flank(bit_in) REG_IN & (1 << bit_in)
 
@@ -103,6 +109,8 @@ TEST(Pulse, GateOffStopButton) {
   // Press stop button
   press_stop();
   buttonManager(&state);
+  press_rewind();
+  buttonManager(&state);
   ASSERT_FALSE(state.gate_on);
 }
 
@@ -111,11 +119,16 @@ TEST(Pulse, StartHostBeat) {
   state.measure_counter = 200;
   int tempo = state.measure_counter / state.multiplier;
 
+  state.tempo = 66;
+
   press_start();
   buttonManager(&state);
   release_start();
   startHostBeat(&state);
   ASSERT_NE(0, state.sync_pulse_on); // Pulse is on
+  ASSERT_EQ(66, state.tempo); // Tempo is Measure Counter divided by MULTIPLYER
+  state.measure_counter = 200;
+  startHostBeat(&state);
   ASSERT_EQ(tempo, state.tempo); // Tempo is Measure Counter divided by MULTIPLYER
 }
 
@@ -166,9 +179,11 @@ TEST(Pulse, Gate) {
   ASSERT_EQ(5, state.tempo);
   flank_trig_low();
   press_stop();
+  press_rewind();
   run(pulse, 70);
   ASSERT_EQ(5, state.tempo);
   release_stop();
+  release_rewind();
   ASSERT_FALSE(state.gate_on);
   press_start();
   flank_trig_high();
@@ -206,6 +221,7 @@ TEST(Pulse, Gate2) {
   flank_trig_high();
   run(pulse, 1);
   press_stop();
+  press_rewind();
   run(pulse, 1);
   release_stop();
   run(pulse, 1);
@@ -250,6 +266,10 @@ TEST(Pulse, StartSignal) {
   ASSERT_NE(0, read_sync_start());
   ASSERT_TRUE(state.gate_on);
   press_stop();
+  run(pulse, 2);
+  ASSERT_TRUE(state.gate_on);
+  ASSERT_NE(0, read_sync_start());
+  press_rewind();
   run(pulse, 2);
   ASSERT_FALSE(state.gate_on);
   ASSERT_EQ(0, read_sync_start());

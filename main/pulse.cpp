@@ -12,10 +12,22 @@ void makePulse(state_t *state) {
 }
 
 void buttonManager(state_t *state) {
-  if (read_in(state->register_in, state->play_in) == 0) {
+  if (read_in(state->buttonline_in, state->line0_in)) {
+    state->last_line = 0;
+    //set_low(state->register_debug, 5); //debug
+  }
+  if (read_in(state->buttonline_in, state->line1_in)) {
+    state->last_line = 1;
+    //set_high(state->register_debug, 5); //debug
+  }
+
+  if (read_in(state->register_in, state->play_in) == 0 && state->last_line == 1) { // play
     state->gate_on = true;
   }
-  if (read_in(state->register_in, state->stop_in) == 0) {
+  if (read_in(state->register_in, state->stop_in) == 0 && state->last_line == 1) { // stop
+    state->trig_since_gate = false;
+  }
+  if (read_in(state->register_in, state->rewind_in) == 0 && state->last_line == 0) { // rewind
     state->gate_on = false;
     state->trig_since_gate = false;
   }
